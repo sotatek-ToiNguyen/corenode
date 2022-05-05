@@ -18,5 +18,10 @@ module.exports = function(app) {
     controller.signup
   );
 
+  app.post(
+      "/api/auth/verify",
+      controller.verify
+  );
+
   app.post("/api/auth/signin", controller.signin);
 };
