@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: testdb
+    ports:
+      - 3309:3306
+  redis:
+    image: redis
+    restart: always
+    expose:
+      - 6379

@@ -2,38 +2,30 @@ const db = require("../models");
 const config = require("../config/auth.config");
 const User = db.user;
 const Role = db.role;
-
+const { getRandomInt } = require("../helpers/generate");
 const Op = db.Sequelize.Op;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+const {sendMessageSMSByTwilio} = require("../helpers/twitlio");
 
 exports.signup = (req, res) => {
+    const code = getRandomInt(1000, 9999);
+    console.log(code);
   // Save User to Database
   User.create({
     username: req.body.username,
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 8)
-  })
-    .then(user => {
-      if (req.body.roles) {
-        Role.findAll({
-          where: {
-            name: {
-              [Op.or]: req.body.roles
-            }
-          }
-        }).then(roles => {
-          user.setRoles(roles).then(() => {
-            res.send({ message: "User registered successfully!" });
-          });
-        });
-      } else {
-        // user role = 1
-        user.setRoles([1]).then(() => {
-          res.send({ message: "User registered successfully!" });
-        });
-      }
+    lastname: req.body.lastname,
+    firstname: req.body.firstname,
+    phone: req.body.phone,
+    code: req.body.code,
+    password: bcrypt.hashSync(req.body.password, 8),
+    status: false
+  }).then(async user => {
+      const code = getRandomInt(1000, 9999);
+      console.log(code);
+      await sendMessageSMSByTwilio(code, req.body.phone)
+      res.send({ message: "User registered successfully!" });
     })
     .catch(err => {
       res.status(500).send({ message: err.message });
@@ -64,7 +56,7 @@ exports.signin = (req, res) => {
       }
 
       var token = jwt.sign({ id: user.id }, config.secret, {
-        expiresIn: 86400 // 24 hours
+        expiresIn: 86400*3 // 3 days
       });
 
       var authorities = [];
