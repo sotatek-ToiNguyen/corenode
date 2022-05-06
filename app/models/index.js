@@ -17,15 +17,11 @@ const sequelize = new Sequelize(
     }
   }
 );
-
 const db = {};
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.user = require("../models/user.model.js")(sequelize, Sequelize);
-
-
-db.ROLES = ["user", "admin", "moderator"];
 
 module.exports = db;
